@@ -1,19 +1,14 @@
 node {
 
-    // --- Tools Setup ---
-    tools {
-        nodejs "node16"
-    }
-
-    // --- Environment Variables ---
-    env.PATH = "${env.PATH}:/opt/sonar-scanner/bin"
+    // --- Tool Initialization (Scripted syntax) ---
+    def nodeHome = tool name: 'node16', type: 'nodejs'
+    env.PATH = "${env.PATH}:${nodeHome}/bin:/opt/sonar-scanner/bin"
 
     try {
 
         stage('Clone Repository') {
             echo "Cloning React frontend repo..."
-            git branch: 'main',
-                url: 'https://github.com/OT-MICROSERVICES/frontend'
+            git branch: 'main', url: 'https://github.com/OT-MICROSERVICES/frontend'
         }
 
         stage('Install Dependencies') {
@@ -23,7 +18,7 @@ node {
 
         stage('ESLint Static Code Analysis') {
             echo "Running ESLint analysis..."
-            sh 'npx eslint src || true'    // Do not fail pipeline
+            sh 'npx eslint src || true'
         }
 
         stage('SonarQube Analysis') {
@@ -56,8 +51,6 @@ node {
         throw err
 
     } finally {
-
         echo "Pipeline execution completed!"
-
     }
 }
